@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Последние вакансии</h2>
+    <ul>
+        {% for vacancy in vacancies %}
+            <li>
+                <h3>{{ vacancy.name }}</h3>
+                <p>Описание: {{ vacancy.description|safe|default:"Описание отсутствует" }}</p>
+                <p>Навыки: {{ vacancy.snippet.requirement|default:"Навыки не указаны" }}</p>
+                <p>Компания: {{ vacancy.employer.name|default:"Компания не указана" }}</p>
+                <p>Оклад: {{ vacancy.salary.from|default:"Не указан" }} - {{ vacancy.salary.to|default:"Не указан" }} {{ vacancy.salary.currency|default:"" }}</p>
+                <p>Регион: {{ vacancy.area.name|default:"Регион не указан" }}</p>
+                <p>Дата публикации: {{ vacancy.published_at|date:"Y-m-d H:i:s" }}</p>
+                <p><a href="{{ vacancy.alternate_url }}" target="_blank">Ссылка на вакансию</a></p>
+            </li>
+        {% empty %}
+            <p>Нет доступных вакансий.</p>
+        {% endfor %}
+    </ul>
+{% endblock %}

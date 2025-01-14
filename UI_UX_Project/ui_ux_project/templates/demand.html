@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+    <h2>Востребованность</h2>
+    
+    <!-- Динамика уровня зарплат по годам -->
+    <h3>Динамика уровня зарплат по годам</h3>
+    <div id="demand_salary_chart"></div>
+    <div id="image-container">
+        {% if demand_salary_chart_image %}
+            <img src="{{ demand_salary_chart_image.image.url }}" alt="Динамика зарплат по годам">
+        {% else %}
+            <p>Изображение не найдено.</p>
+        {% endif %}
+    </div>
+
+    <!-- Таблица: Динамика уровня зарплат по годам -->
+    <table class="horizontal-table">
+        <thead>
+            <tr>
+                <th>Год</th>
+                <th>Средняя зарплата (в рублях)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in demand_salary_dynamics %}
+            <tr>
+                <td>{{ row.year }}</td>
+                <td>{{ row.average_salary|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Динамика количества вакансий по годам -->
+    <h3>Динамика количества вакансий по годам</h3>
+    <div id="demand_vacancies_chart"></div>
+    <div id="image-container">
+        {% if demand_vacancy_chart_image %}
+            <img src="{{ demand_vacancy_chart_image.image.url }}" alt="Динамика вакансий по годам">
+        {% else %}
+            <p>Изображение не найдено.</p>
+        {% endif %}
+    </div>
+
+    <!-- Таблица: Динамика количества вакансий по годам -->
+    <table class="horizontal-table">
+        <thead>
+            <tr>
+                <th>Год</th>
+                <th>Количество вакансий</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in demand_vacancy_dynamics %}
+            <tr>
+                <td>{{ row.year }}</td>
+                <td>{{ row.vacancy_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

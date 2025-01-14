@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+    <h2>Общая статистика</h2>
+    
+    <!-- Динамика уровня зарплат по годам -->
+    <h3>Динамика уровня зарплат по годам</h3>
+    <div id="salary_chart"></div>
+    <div id="image-container">
+        {% if salary_chart_image %}
+            <img src="{{ salary_chart_image.image.url }}" alt="Динамика зарплат по годам">
+        {% else %}
+            <p>Изображение не найдено.</p>
+        {% endif %}
+    </div>
+
+    <table class="horizontal-table"> <!-- Таблица: Динамика уровня зарплат по годам -->
+        <thead>
+            <tr>
+                <th>Год</th>
+                <th>Средняя зарплата</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in salary_dynamics %}
+            <tr>
+                <td>{{ row.year }}</td>
+                <td>{{ row.average_salary|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Динамика количества вакансий по годам -->
+    <h3>Динамика количества вакансий по годам</h3>
+    <div id="vacancies_chart"></div>
+    <div id="image-container">
+        {% if vacancy_chart_image %}
+            <img src="{{ vacancy_chart_image.image.url }}" alt="Динамика вакансий по годам">
+        {% else %}
+            <p>Изображение не найдено.</p>
+        {% endif %}
+    </div>
+    <table class="horizontal-table"> <!-- Таблица: Динамика количества вакансий по годам -->
+        <thead>
+            <tr>
+                <th>Год</th>
+                <th>Количество вакансий</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in vacancy_dynamics %}
+            <tr>
+                <td>{{ row.year }}</td>
+                <td>{{ row.vacancy_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Уровень зарплат по городам -->
+    <h3>Уровень зарплат по городам</h3>
+    <div id="city_salary_chart"></div>
+    <div id="image-container">
+        {% if city_salary_chart_image %}
+            <img src="{{ city_salary_chart_image.image.url }}" alt="Уровень зарплат по городам">
+        {% else %}
+            <p>Изображение не найдено.</p>
+        {% endif %}
+    </div>
+    <table class="horizontal-table"> <!-- Таблица: Уровень зарплат по городам -->
+        <thead>
+            <tr>
+                <th>Город</th>
+                <th>Средняя зарплата</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in city_salary %}
+            <tr>
+                <td>{{ row.city }}</td>
+                <td>{{ row.average_salary|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Доля вакансий по городам -->
+    <h3>Доля вакансий по городам</h3>
+    <div id="city_share_chart"></div>
+    <div id="image-container">
+        {% if city_share_chart_image %}
+            <img src="{{ city_share_chart_image.image.url }}" alt="Доля вакансий по городам">
+        {% else %}
+            <p>Изображение не найдено.</p>
+        {% endif %}
+    </div>
+    <table class="horizontal-table">
+        <thead>
+            <tr>
+                <th>Город</th>
+                <th>Доля вакансий</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in city_share %}
+            <tr>
+                <td>{{ row.city }}</td>
+                <td>{{ row.vacancy_share|floatformat:4 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Топ-20 навыков -->
+    <div class="skills_list">
+        <h2>Топ 20 навыков за</h2>
+        <select id="skills-select" onchange="updateSkillsTable()">
+            {% for year in years %}
+            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+            {% endfor %}
+        </select>
+        <h2>год</h2>
+    </div>
+    <div id="image-container">    <!-- График для топ-20 навыков -->
+        {% if skills_chart_image %}
+            <img id="skills-image" src="{{ skills_chart_image.image.url }}" alt="Топ навыков {{ selected_year }}">
+        {% else %}
+            <p>Изображение не найдено.</p>
+        {% endif %}
+    </div>
+
+    <!-- Таблица: Топ-20 навыков -->
+    <table id="top-skills-table" class="horizontal-table">
+        <thead>
+            <tr>
+                <th>Навык</th>
+                <th>Количество упоминаний</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for skill in top_skills %}
+            <tr>
+                <td>{{ skill.skill }}</td>
+                <td>{{ skill.count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function updateSkillsTable() {
+    const selectElement = document.getElementById("skills-select");
+    const selectedYear = selectElement.value;
+
+    fetch(`?year=${selectedYear}`)
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Обновляем только нужные части страницы
+            document.getElementById('top-skills-table').innerHTML = doc.getElementById('top-skills-table').innerHTML;
+            document.getElementById('skills-image').src = doc.getElementById('skills-image').src;
+        })
+        .catch(error => console.error('Ошибка при загрузке данных:', error));
+}
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const selectElement = document.getElementById("skills-select");
+            selectElement.value = "{{ selected_year }}";
+        });
+    </script>
+{% endblock %}

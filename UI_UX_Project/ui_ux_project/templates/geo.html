@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>География</h2>
+
+    <!-- Уровень зарплат по городам -->
+    <h3>Уровень зарплат по городам для выбранной профессии</h3>
+    <div id="image-container">
+        {% if geo_salary_chart_image %}
+            <img src="{{ geo_salary_chart_image.image.url }}" alt="Уровень зарплат по городам">
+        {% else %}
+            <p>Изображение не найдено.</p>
+        {% endif %}
+    </div>
+    <table class="horizontal-table">
+        <thead>
+            <tr>
+                <th>Город</th>
+                <th>Средняя зарплата (в рублях)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in geo_salary %}
+            <tr>
+                <td>{{ row.city }}</td>
+                <td>{{ row.average_salary|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Доля вакансий по городам -->
+    <h3>Доля вакансий по городам для выбранной профессии</h3>
+    <div id="image-container">
+        {% if geo_share_chart_image %}
+            <img src="{{ geo_share_chart_image.image.url }}" alt="Доля вакансий по городам">
+        {% else %}
+            <p>Изображение не найдено.</p>
+        {% endif %}
+    </div>
+    <table class="horizontal-table">
+        <thead>
+            <tr>
+                <th>Город</th>
+                <th>Доля вакансий</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in geo_share %}
+            <tr>
+                <td>{{ row.city }}</td>
+                <td>{{ row.vacancy_share|floatformat:2 }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

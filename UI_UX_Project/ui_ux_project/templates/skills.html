@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>ТОП UX/UI Навыки</h2>
+
+    <div class="skills_list">
+        <h2>Топ 20 UX/UI навыков за</h2>
+        <select id="skills-select" onchange="updateSkillsTable()">
+            {% for year in years %}
+                <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+            {% endfor %}
+        </select>
+        <h2>год</h2>
+    </div>
+
+    <!-- График для топ-20 UX/UI навыков -->
+    <div id="image-container">
+        {% if uxui_skills_chart_image %}
+            <img id="uxui-skills-image" src="{{ uxui_skills_chart_image.image.url }}" alt="Топ UX/UI навыков {{ selected_year }}">
+        {% else %}
+            <p>Изображение не найдено.</p>
+        {% endif %}
+    </div>
+
+    <!-- Таблица: Топ-20 UX/UI навыков -->
+    <table id="top-uxui-skills-table" class="horizontal-table">
+        <thead>
+            <tr>
+                <th>Навык</th>
+                <th>Количество упоминаний</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for skill in top_uxui_skills %}
+                <tr>
+                    <td>{{ skill.skill }}</td>
+                    <td>{{ skill.count }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">Данные не найдены.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function updateSkillsTable() {
+            const selectElement = document.getElementById("skills-select");
+            const selectedYear = selectElement.value;
+
+            // Отправляем AJAX-запрос на сервер
+            fetch(`?year=${selectedYear}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка сети');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    // Создаем временный элемент для парсинга HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Обновляем только нужные части страницы
+                    const newTable = doc.getElementById('top-uxui-skills-table');
+                    const newImage = doc.getElementById('uxui-skills-image');
+
+                    if (newTable && newImage) {
+                        document.getElementById('top-uxui-skills-table').innerHTML = newTable.innerHTML;
+                        document.getElementById('uxui-skills-image').src = newImage.src;
+                    } else {
+                        console.error('Не удалось найти элементы для обновления');
+                    }
+                })
+                .catch(error => console.error('Ошибка при загрузке данных:', error));
+        }
+
+        // Инициализация таблицы при загрузке страницы
+        document.addEventListener("DOMContentLoaded", () => {
+            const selectElement = document.getElementById("skills-select");
+            if (selectElement) {
+                selectElement.value = "{{ selected_year }}";
+            }
+        });
+    </script>
+{% endblock %}
