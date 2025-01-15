@@ -115,13 +115,13 @@
 
     <!-- Топ-20 навыков -->
     <div class="skills_list">
-        <h2 style="margin-top: 40px;">Топ 20 навыков за</h2>
-        <select id="skills-select" onchange="updateSkillsTable()" style="margin-top: 40px;">
+        <h3 style="margin-top: 40px;">Топ 20 навыков за</h3>
+        <select id="skills-select" onchange="updateSkillsTable()" style="margin-top: 20px;">
             {% for year in years %}
             <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
             {% endfor %}
         </select>
-        <h2 style="margin-top: 40px;">год</h2>
+        <h3 style="margin-top: 40px;">год</h3>
     </div>
     <div id="image-container"> <!-- График для топ-20 навыков -->
         {% if skills_chart_image %}

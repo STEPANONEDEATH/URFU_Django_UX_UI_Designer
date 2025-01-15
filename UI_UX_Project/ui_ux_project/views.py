@@ -423,7 +423,7 @@ class VacanciesView(TemplateView):
         # Обрабатываем списки (<ul>, <ol>)
         for list_tag in soup.find_all(['ul', 'ol']):
             for li in list_tag.find_all('li', recursive=False):
-                li.string = f"• {li.get_text(strip=True)}"
+                li.string = f"– {li.get_text(strip=True)}"
                 li.append(soup.new_tag('br'))
             list_tag.unwrap()
 
