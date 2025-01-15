@@ -21,7 +21,7 @@ def get_vacancies(profession_keywords):
     :return: Список вакансий.
     """
     params = {
-        'text': profession_keywords,  # Ключевые слова объединяются логическим "ИЛИ"
+        'text': profession_keywords, 
         'order_by': 'publication_time',
         'per_page': 10,
         'search_field': 'name'
@@ -94,14 +94,14 @@ def clean_html(self, html_text):
     # Обрабатываем списки (<ul>, <ol>)
     for list_tag in soup.find_all(['ul', 'ol']):
         for li in list_tag.find_all('li', recursive=False):
-            li.string = f"• {li.get_text(strip=True)}"  # Добавляем маркер для каждого элемента списка
-            li.append(soup.new_tag('br'))  # Добавляем перенос строки после каждого элемента списка
-        list_tag.unwrap()  # Убираем тег списка, оставляя только элементы
+            li.string = f"• {li.get_text(strip=True)}"
+            li.append(soup.new_tag('br'))
+        list_tag.unwrap()
 
     # Добавляем переносы строк между блоками текста
     for tag in soup.find_all(['p', 'br', 'strong', 'em']):
         if tag.name == 'p' and tag.get_text(strip=True):
-            tag.append(soup.new_tag('br'))  # Добавляем перенос строки после каждого абзаца
+            tag.append(soup.new_tag('br')) 
 
     # Удаляем все остальные HTML-теги, кроме <p>, <br>, <strong>, <em>
     allowed_tags = ['p', 'br', 'strong', 'em']
