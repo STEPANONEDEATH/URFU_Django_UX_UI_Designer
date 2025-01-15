@@ -5,7 +5,7 @@
     <h2>Востребованность</h2>
     
     <!-- Динамика уровня зарплат по годам -->
-    <h3>Динамика уровня зарплат по годам</h3>
+    <h3>Динамика уровня зарплат по годам UX/UI дизайнеров</h3>
     <div id="demand_salary_chart"></div>
     <div id="image-container">
         {% if demand_salary_chart_image %}
@@ -27,14 +27,14 @@
             {% for row in demand_salary_dynamics %}
             <tr>
                 <td>{{ row.year }}</td>
-                <td>{{ row.average_salary|floatformat:2 }}</td>
+                <td>{{ row.average_salary|floatformat:0 }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <!-- Динамика количества вакансий по годам -->
-    <h3>Динамика количества вакансий по годам</h3>
+    <h3 style="margin-top: 40px;">Динамика количества вакансий по годам UX/UI дизайнеров</h3>
     <div id="demand_vacancies_chart"></div>
     <div id="image-container">
         {% if demand_vacancy_chart_image %}

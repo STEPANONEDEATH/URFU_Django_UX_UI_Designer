@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime
+from bs4 import BeautifulSoup
 
 def get_vacancy_details(vacancy_id):
     """
@@ -78,3 +79,78 @@ def truncate_text(text, max_length=500):
     :return: Обрезанный текст с многоточием, если он превышает длину.
     """
     return text if len(text) <= max_length else text[:max_length - 3] + '...'
+
+def clean_html(self, html_text):
+    """
+    Удаляет HTML-разметку из текста и форматирует списки.
+    :param html_text: Исходный HTML-текст.
+    :return: Очищенный и отформатированный текст с HTML-тегами.
+    """
+    if not html_text:
+        return '<p>Описание отсутствует</p>'
+
+    soup = BeautifulSoup(html_text, 'html.parser')
+
+    # Обрабатываем списки (<ul>, <ol>)
+    for list_tag in soup.find_all(['ul', 'ol']):
+        for li in list_tag.find_all('li', recursive=False):
+            li.string = f"• {li.get_text(strip=True)}"  # Добавляем маркер для каждого элемента списка
+            li.append(soup.new_tag('br'))  # Добавляем перенос строки после каждого элемента списка
+        list_tag.unwrap()  # Убираем тег списка, оставляя только элементы
+
+    # Добавляем переносы строк между блоками текста
+    for tag in soup.find_all(['p', 'br', 'strong', 'em']):
+        if tag.name == 'p' and tag.get_text(strip=True):
+            tag.append(soup.new_tag('br'))  # Добавляем перенос строки после каждого абзаца
+
+    # Удаляем все остальные HTML-теги, кроме <p>, <br>, <strong>, <em>
+    allowed_tags = ['p', 'br', 'strong', 'em']
+    for tag in soup.find_all(True):
+        if tag.name not in allowed_tags:
+            tag.unwrap()
+
+    # Возвращаем очищенный HTML
+    return str(soup)
+
+
+def format_vacancy(vacancy):
+    """
+    Форматирует информацию о вакансии в единый формат.
+    :param vacancy: Данные о вакансии.
+    :return: Отформатированная информация о вакансии.
+    """
+    vacancy_details = get_vacancy_details(vacancy['id'])
+    if not vacancy_details:
+        return None
+
+    description = clean_html(vacancy_details.get('description', 'Описание отсутствует'))
+    salary = format_salary(vacancy.get('salary'))
+    published_at = format_date(vacancy.get('published_at'))
+
+    formatted_vacancy = {
+        'name': vacancy.get('name', 'Название не указано'),
+        'salary': salary,
+        'description': truncate_text(description),
+        'published_at': published_at,
+        'employer': vacancy.get('employer', {}).get('name', 'Работодатель не указан'),
+        'experience': vacancy.get('experience', {}).get('name', 'Опыт не указан'),
+        'employment': vacancy.get('employment', {}).get('name', 'Тип занятости не указан')
+    }
+
+    return formatted_vacancy
+
+def main():
+    profession_keywords = ["design", "ux", "ui", "дизайн", "иллюстратор"]
+    vacancies = get_vacancies(profession_keywords)
+
+    formatted_vacancies = []
+    for vacancy in vacancies:
+        formatted_vacancy = format_vacancy(vacancy)
+        if formatted_vacancy:
+            formatted_vacancies.append(formatted_vacancy)
+
+    for vacancy in formatted_vacancies:
+        print(vacancy)
+
+if __name__ == "__main__":
+    main()

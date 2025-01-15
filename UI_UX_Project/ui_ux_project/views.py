@@ -108,7 +108,6 @@ class SkillsView(TemplateView):
         return context
 
 
-
 class CSVUploadView(TemplateView):
     template_name = 'csv_upload.html'
 
@@ -289,18 +288,29 @@ def vacancy_list(request):
     vacancies = get_vacancies(profession)
     return render(request, 'vacancy.html', {'vacancies': vacancies})
 
+from django.views.generic import TemplateView
+import requests
+from bs4 import BeautifulSoup
+from datetime import datetime
+
+from django.views.generic import TemplateView
+import requests
+from bs4 import BeautifulSoup
+from datetime import datetime
+
 class VacanciesView(TemplateView):
     template_name = 'vacancies.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # Получение вакансий через API HH
         context['vacancies'] = self.get_vacancies_from_api()
-        
         return context
 
     def get_vacancies_from_api(self):
+        """
+        Получает список вакансий через API HH и обрабатывает их.
+        :return: Список отформатированных вакансий.
+        """
         url = "https://api.hh.ru/vacancies"
         params = {
             'period': 1,
@@ -314,28 +324,82 @@ class VacanciesView(TemplateView):
             response.raise_for_status()
             data = response.json()
             vacancies = data.get('items', [])
-            
-            # Для каждой вакансии получаем полное описание
+
+            # Для каждой вакансии получаем полное описание и обрабатываем его
             for vacancy in vacancies:
                 vacancy_id = vacancy.get('id')
                 if vacancy_id:
                     vacancy_details = self.get_vacancy_details(vacancy_id)
                     if vacancy_details:
-                        # Обрабатываем описание: преобразуем <ul> и <li> в тире
+                        # Очищаем описание от HTML-разметки и форматируем
                         description = vacancy_details.get('description', '')
-                        vacancy['description'] = self.convert_ul_to_dash(description)
+                        vacancy['description'] = self.clean_html(description)
+
+                        # Очищаем навыки от HTML-разметки
+                        snippet = vacancy.get('snippet', {})
+                        requirement = snippet.get('requirement', '')
+                        vacancy['snippet']['requirement'] = self.clean_html(requirement)
+
+                        # Форматируем дату публикации
+                        published_at = vacancy_details.get('published_at')
+                        vacancy['published_at'] = self.format_date(published_at)
+
+                        # Добавляем данные о зарплате, если они есть
+                        salary = vacancy_details.get('salary')
+                        if salary:
+                            vacancy['salary'] = {
+                                'from': salary.get('from'),
+                                'to': salary.get('to'),
+                                'currency': salary.get('currency')
+                            }
+                        else:
+                            vacancy['salary'] = None
+
+                        # Добавляем данные о работодателе
+                        employer = vacancy_details.get('employer', {})
+                        vacancy['employer'] = {
+                            'name': employer.get('name')
+                        }
+
+                        # Добавляем данные о регионе
+                        area = vacancy_details.get('area', {})
+                        vacancy['area'] = {
+                            'name': area.get('name')
+                        }
+
+                        # Добавляем ссылку на вакансию
+                        vacancy['alternate_url'] = vacancy_details.get('alternate_url', '#')
                     else:
+                        # Если детали вакансии не получены, устанавливаем значения по умолчанию
                         vacancy['description'] = 'Описание отсутствует'
+                        vacancy['snippet']['requirement'] = 'Навыки не указаны'
+                        vacancy['published_at'] = 'Дата отсутствует'
+                        vacancy['salary'] = None
+                        vacancy['employer'] = {'name': 'Компания не указана'}
+                        vacancy['area'] = {'name': 'Регион не указан'}
+                        vacancy['alternate_url'] = '#'
                 else:
+                    # Если ID вакансии отсутствует, устанавливаем значения по умолчанию
                     vacancy['description'] = 'Описание отсутствует'
-            
+                    vacancy['snippet']['requirement'] = 'Навыки не указаны'
+                    vacancy['published_at'] = 'Дата отсутствует'
+                    vacancy['salary'] = None
+                    vacancy['employer'] = {'name': 'Компания не указана'}
+                    vacancy['area'] = {'name': 'Регион не указан'}
+                    vacancy['alternate_url'] = '#'
+
         except requests.RequestException as e:
             vacancies = []
             print(f"Ошибка при запросе к API HH: {e}")
-        
+
         return vacancies
 
     def get_vacancy_details(self, vacancy_id):
+        """
+        Получает детали вакансии по её ID.
+        :param vacancy_id: ID вакансии.
+        :return: Данные вакансии или None.
+        """
         url = f"https://api.hh.ru/vacancies/{vacancy_id}"
         try:
             response = requests.get(url)
@@ -345,21 +409,51 @@ class VacanciesView(TemplateView):
             print(f"Ошибка при запросе деталей вакансии: {e}")
             return None
 
-    def convert_ul_to_dash(self, html_text):
+    def clean_html(self, html_text):
         """
-        Преобразует HTML-списки (<ul>, <li>) в текст с тире.
+        Удаляет HTML-разметку из текста и форматирует списки.
         :param html_text: Исходный HTML-текст.
-        :return: Обработанный текст.
+        :return: Очищенный и отформатированный текст с HTML-тегами.
         """
+        if not html_text:
+            return '<p>Описание отсутствует</p>'
+
         soup = BeautifulSoup(html_text, 'html.parser')
-        
-        # Находим все теги <ul>
-        for ul in soup.find_all('ul'):
-            # Для каждого <li> внутри <ul> заменяем его на текст с тире и переносом строки
-            for li in ul.find_all('li'):
-                li.replace_with(f"— {li.get_text(strip=True)}\n")
-            # Удаляем сам тег <ul>
-            ul.unwrap()
-        
-        # Возвращаем обработанный HTML
+
+        # Обрабатываем списки (<ul>, <ol>)
+        for list_tag in soup.find_all(['ul', 'ol']):
+            for li in list_tag.find_all('li', recursive=False):
+                li.string = f"• {li.get_text(strip=True)}"  # Добавляем маркер для каждого элемента списка
+                li.append(soup.new_tag('br'))  # Добавляем перенос строки после каждого элемента списка
+            list_tag.unwrap()  # Убираем тег списка, оставляя только элементы
+
+        # Добавляем переносы строк между блоками текста
+        for tag in soup.find_all(['p', 'br', 'strong', 'em']):
+            if tag.name == 'p' and tag.get_text(strip=True):
+                tag.append(soup.new_tag('br'))  # Добавляем перенос строки после каждого абзаца
+
+        # Удаляем все остальные HTML-теги, кроме <p>, <br>, <strong>, <em>
+        allowed_tags = ['p', 'br', 'strong', 'em']
+        for tag in soup.find_all(True):
+            if tag.name not in allowed_tags:
+                tag.unwrap()
+
+        # Возвращаем очищенный HTML
         return str(soup)
+
+    def format_date(self, date_str):
+        """
+        Форматирует дату публикации в формат dd/mm/yy.
+        :param date_str: Дата в формате ISO 8601 (например, '2023-10-01T12:34:56+0300').
+        :return: Дата в формате dd/mm/yy или 'Дата отсутствует'.
+        """
+        if not date_str:
+            return 'Дата отсутствует'
+
+        try:
+            # Преобразуем строку в объект datetime
+            date_obj = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S%z')
+            # Форматируем в dd/mm/yy
+            return date_obj.strftime('%d/%m/%y')
+        except ValueError:
+            return 'Дата отсутствует'

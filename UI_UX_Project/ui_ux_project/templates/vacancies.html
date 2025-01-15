@@ -2,17 +2,30 @@
 
 {% block content %}
     <h2>Последние вакансии</h2>
-    <ul>
+    <ul class="vacancies-list">
         {% for vacancy in vacancies %}
-            <li>
-                <h3>{{ vacancy.name }}</h3>
-                <p>Описание: {{ vacancy.description|safe|default:"Описание отсутствует" }}</p>
-                <p>Навыки: {{ vacancy.snippet.requirement|default:"Навыки не указаны" }}</p>
-                <p>Компания: {{ vacancy.employer.name|default:"Компания не указана" }}</p>
-                <p>Оклад: {{ vacancy.salary.from|default:"Не указан" }} - {{ vacancy.salary.to|default:"Не указан" }} {{ vacancy.salary.currency|default:"" }}</p>
-                <p>Регион: {{ vacancy.area.name|default:"Регион не указан" }}</p>
-                <p>Дата публикации: {{ vacancy.published_at|date:"Y-m-d H:i:s" }}</p>
-                <p><a href="{{ vacancy.alternate_url }}" target="_blank">Ссылка на вакансию</a></p>
+            <li class="vacancy-item">
+                <h3 class="vacancy-title">{{ vacancy.name }}</h3>
+                <div class="vacancy-description">
+                    <strong>Описание:</strong>
+                    {{ vacancy.description|safe|default:"Описание отсутствует" }}
+                </div>
+                <div class="vacancy-skills">
+                    <strong>Навыки:</strong>
+                    {{ vacancy.snippet.requirement|safe|default:"Навыки не указаны" }}
+                </div>
+                <p class="vacancy-company"><strong>Компания:</strong> {{ vacancy.employer.name|default:"Компания не указана" }}</p>
+                <p class="vacancy-salary">
+                    <strong>Оклад:</strong>
+                    {% if vacancy.salary %}
+                        {{ vacancy.salary.from|default:"Не указан" }} - {{ vacancy.salary.to|default:"Не указан" }} {{ vacancy.salary.currency|default:"" }}
+                    {% else %}
+                        Не указан
+                    {% endif %}
+                </p>
+                <p class="vacancy-region"><strong>Город:</strong> {{ vacancy.area.name|default:"Регион не указан" }}</p>
+                <p class="vacancy-date"><strong>Дата публикации:</strong> {{ vacancy.published_at|default:"Дата отсутствует" }}</p>
+                <p class="vacancy-link"><a href="{{ vacancy.alternate_url }}" target="_blank">Перейти к вакансии</a></p>
             </li>
         {% empty %}
             <p>Нет доступных вакансий.</p>

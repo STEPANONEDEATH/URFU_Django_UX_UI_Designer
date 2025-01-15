@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>ТОП UX/UI Навыки</h2>
+    <h2 style="margin-bottom: 5px;">Самые востребованные навыки для UX/UI дизайнера</h2>
 
     <div class="skills_list">
-        <h2>Топ 20 UX/UI навыков за</h2>
+        <h3>Топ 20 UX/UI навыков за</h3>
         <select id="skills-select" onchange="updateSkillsTable()">
             {% for year in years %}
                 <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
             {% endfor %}
         </select>
-        <h2>год</h2>
+        <h3>год</h3>
     </div>
 
     <!-- График для топ-20 UX/UI навыков -->

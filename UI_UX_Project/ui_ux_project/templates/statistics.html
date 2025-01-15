@@ -26,14 +26,14 @@
             {% for row in salary_dynamics %}
             <tr>
                 <td>{{ row.year }}</td>
-                <td>{{ row.average_salary|floatformat:2 }}</td>
+                <td>{{ row.average_salary|floatformat:0 }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <!-- Динамика количества вакансий по годам -->
-    <h3>Динамика количества вакансий по годам</h3>
+    <h3 style="margin-top: 40px;">Динамика количества вакансий по годам</h3>
     <div id="vacancies_chart"></div>
     <div id="image-container">
         {% if vacancy_chart_image %}
@@ -60,7 +60,7 @@
     </table>
 
     <!-- Уровень зарплат по городам -->
-    <h3>Уровень зарплат по городам</h3>
+    <h3 style="margin-top: 40px;">Уровень зарплат по городам</h3>
     <div id="city_salary_chart"></div>
     <div id="image-container">
         {% if city_salary_chart_image %}
@@ -80,14 +80,14 @@
             {% for row in city_salary %}
             <tr>
                 <td>{{ row.city }}</td>
-                <td>{{ row.average_salary|floatformat:2 }}</td>
+                <td>{{ row.average_salary|floatformat:0 }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <!-- Доля вакансий по городам -->
-    <h3>Доля вакансий по городам</h3>
+    <h3 style="margin-top: 40px;">Доля вакансий по городам</h3>
     <div id="city_share_chart"></div>
     <div id="image-container">
         {% if city_share_chart_image %}
@@ -107,7 +107,7 @@
             {% for row in city_share %}
             <tr>
                 <td>{{ row.city }}</td>
-                <td>{{ row.vacancy_share|floatformat:4 }}</td>
+                <td>{{ row.vacancy_share|floatformat:2 }}%</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -115,15 +115,15 @@
 
     <!-- Топ-20 навыков -->
     <div class="skills_list">
-        <h2>Топ 20 навыков за</h2>
-        <select id="skills-select" onchange="updateSkillsTable()">
+        <h2 style="margin-top: 40px;">Топ 20 навыков за</h2>
+        <select id="skills-select" onchange="updateSkillsTable()" style="margin-top: 40px;">
             {% for year in years %}
             <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
             {% endfor %}
         </select>
-        <h2>год</h2>
+        <h2 style="margin-top: 40px;">год</h2>
     </div>
-    <div id="image-container">    <!-- График для топ-20 навыков -->
+    <div id="image-container"> <!-- График для топ-20 навыков -->
         {% if skills_chart_image %}
             <img id="skills-image" src="{{ skills_chart_image.image.url }}" alt="Топ навыков {{ selected_year }}">
         {% else %}

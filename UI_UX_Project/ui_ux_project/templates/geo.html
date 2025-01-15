@@ -4,7 +4,7 @@
     <h2>География</h2>
 
     <!-- Уровень зарплат по городам -->
-    <h3>Уровень зарплат по городам для выбранной профессии</h3>
+    <h3>Уровень зарплат по городам для UX/UI дизайнеров</h3>
     <div id="image-container">
         {% if geo_salary_chart_image %}
             <img src="{{ geo_salary_chart_image.image.url }}" alt="Уровень зарплат по городам">
@@ -23,14 +23,14 @@
             {% for row in geo_salary %}
             <tr>
                 <td>{{ row.city }}</td>
-                <td>{{ row.average_salary|floatformat:2 }}</td>
+                <td>{{ row.average_salary|floatformat:0 }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <!-- Доля вакансий по городам -->
-    <h3>Доля вакансий по городам для выбранной профессии</h3>
+    <h3 style="margin-top: 40px;">Доля вакансий по городам для UX/UI дизайнеров</h3>
     <div id="image-container">
         {% if geo_share_chart_image %}
             <img src="{{ geo_share_chart_image.image.url }}" alt="Доля вакансий по городам">
