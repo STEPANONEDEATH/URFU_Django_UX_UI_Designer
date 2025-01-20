@@ -107,45 +107,6 @@ class SkillsView(TemplateView):
 
         return context
 
-
-class CSVUploadView(TemplateView):
-    template_name = 'csv_upload.html'
-
-    def post(self, request, *args, **kwargs):
-        csv_file = request.FILES.get('file')
-        if not csv_file:
-            return render(request, 'csv_error.html', {'error': 'Файл не был загружен'})
-
-        try:
-            data = pd.read_csv(csv_file)
-            for _, row in data.iterrows():
-                # Создание записей в соответствующих моделях
-                SalaryDynamic.objects.create(
-                    year=row['year'],
-                    average_salary=row['average_salary']
-                )
-                VacancyDynamic.objects.create(
-                    year=row['year'],
-                    vacancy_count=row['vacancy_count']
-                )
-                CitySalary.objects.create(
-                    city=row['city'],
-                    average_salary=row['average_salary']
-                )
-                CityVacancyShare.objects.create(
-                    city=row['city'],
-                    vacancy_share=row['vacancy_share']
-                )
-                # Добавляем данные для топ-20 навыков
-                if 'skill' in row and 'count' in row:
-                    TopSkills.objects.create(
-                        year=row['year'],
-                        skill=row['skill'],
-                        count=row['count']
-                    )
-            return render(request, 'csv_success.html')
-        except Exception as e:
-            return render(request, 'csv_error.html', {'error': str(e)})
         
 class StatisticsView(TemplateView):
     template_name = 'statistics.html'
