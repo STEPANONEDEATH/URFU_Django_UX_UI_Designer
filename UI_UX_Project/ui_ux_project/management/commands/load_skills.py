@@ -1,5 +1,3 @@
-# your_app/management/commands/load_skills.py
-
 from django.core.management.base import BaseCommand
 from ui_ux_project.models import TopUXUISkills
 
