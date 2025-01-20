@@ -10,7 +10,6 @@ urlpatterns = [
     path('', MainPageView.as_view(), name='main'),                      # Главная страница
     path('statistics/', StatisticsView.as_view(), name='statistics'),   # Общая статистика
     path('skills/', TopUXUISkillsView.as_view(), name='skills'),        # Навыки
-    path('upload_csv/', CSVUploadView.as_view(), name='upload_csv'),    # Загрузка данных в формате CSV
     path('demand/', DemandView.as_view(), name='demand'),               # Востребованность
     path('geo/', GeoView.as_view(), name='geo'),                        # География
     path('vacancies/', VacanciesView.as_view(), name='vacancies'),      # Последние вакансии
