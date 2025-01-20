@@ -24,8 +24,7 @@ SECRET_KEY = 'django-insecure-8m702=73r1xu(f@&#4ta6u+#i7$u*c^)wv1l1lk*m2k!w8-drc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Разрешенные хосты (для продакшна добавьте ваш домен)
-ALLOWED_HOSTS = ['*']  # Для разработки разрешены все хосты. В продакшне укажите конкретные домены.
+ALLOWED_HOSTS = ['*']  # Для разработки разрешены все хосты. 
 
 # Application definition
 INSTALLED_APPS = [
@@ -35,7 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ui_ux_project',  # Ваше приложение
+    'ui_ux_project', 
 ]
 
 MIDDLEWARE = [
@@ -114,30 +113,3 @@ MEDIA_ROOT = BASE_DIR / 'media'  # Папка для медиафайлов
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Дополнительные настройки (опционально)
-
-# Логирование (для отладки)
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',  # Уровень логирования
-    },
-}
-
-# Настройки для разработки
-if DEBUG:
-    # Показывать SQL-запросы в консоли (для отладки)
-    LOGGING['loggers'] = {
-        'django.db.backends': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-        },
-    }
