@@ -15,8 +15,8 @@ urlpatterns = [
     path('vacancies/', VacanciesView.as_view(), name='vacancies'),      # Последние вакансии
 
     # Админ-панель и аутентификация
-    path('admin/', admin.site.urls),                                                            # Панель администрирования
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),                            # Страница выхода
+    path('admin/', admin.site.urls),                                    # Панель администрирования
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),    # Страница выхода
 ]
 
 # Добавление маршрутов для работы с загружаемыми файлами
