@@ -16,6 +16,8 @@ urlpatterns = [
 
     # Админ-панель и аутентификация
     path('admin/', admin.site.urls),                                    # Панель администрирования
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),     # Страница входа
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),                            # Страница выхода
 ]
 
 # Добавление маршрутов для работы с загружаемыми файлами
